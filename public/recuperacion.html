@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header-container">
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo" class="logo">
+        </div>
+        <nav class="nav-container">
+            <ul class="nav-list">
+                <li><a href="login.html"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <div class="form-container">
+            <h2>Recuperar Contraseña</h2>
+            <form id="solicitar-codigo-form">
+                <div class="input-group">
+                    <label for="email"><i class="fas fa-envelope"></i> Correo Electrónico:</label>
+                    <input type="email" id="email" name="email" placeholder="Ingresa tu correo" required>
+                </div>
+                <button type="submit">Enviar Código</button>
+                <a href="RestablecerC.html">Verificar</a>
+            </form>
+            <p id="mensaje" class="message"></p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 - Tu Plataforma. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        document.getElementById('solicitar-codigo-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+    
+            const response = await fetch('/api/recuperar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+    
+            const data = await response.json();
+            const mensaje = document.getElementById('mensaje');
+    
+            if (data.status === 'success') {
+                mensaje.textContent = 'Se envió un código de verificación a tu correo.';
+                mensaje.style.color = 'green';
+            } else {
+                mensaje.textContent = 'Hubo un error. Por favor, intenta nuevamente.';
+                mensaje.style.color = 'red';
+            }
+        });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restablecer Contraseña</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header-container">
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo" class="logo">
+        </div>
+        <nav class="nav-container">
+            <ul class="nav-list">
+                <li><a href="login.html"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <div class="form-container">
+            <h2>Restablecer Contraseña</h2>
+            <form id="restablecer-codigo-form">
+                <div class="input-group">
+                    <label for="codigo"><i class="fas fa-key"></i> Código de Verificación:</label>
+                    <input type="text" id="codigo" name="codigo" placeholder="Ingresa el código recibido" required>
+                </div>
+                <div class="input-group">
+                    <label for="password"><i class="fas fa-lock"></i> Nueva Contraseña:</label>
+                    <input type="password" id="password" name="password" placeholder="Ingresa tu nueva contraseña" required>
+                </div>
+                <button type="submit">Restablecer Contraseña</button>
+            </form>
+            <p id="mensaje" class="message"></p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 - Tu Plataforma. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        document.getElementById('restablecer-codigo-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const codigo = document.getElementById('codigo').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('/api/restablecer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ codigo, password })
+            });
+
+            const data = await response.json();
+            const mensaje = document.getElementById('mensaje');
+
+            if (data.status === 'success') {
+                mensaje.textContent = 'Contraseña restablecida exitosamente.';
+                mensaje.style.color = 'green';
+            } else {
+                mensaje.textContent = 'Código inválido o expirado.';
+                mensaje.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>

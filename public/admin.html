@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración UVM</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header-container">
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo UVM" class="logo">
+        </div>
+        <nav class="nav-container">
+            <ul class="nav-list">
+                <li><a href="add_student.html"><i class="fas fa-user-plus"></i> Administrar Usuarios</a></li>
+                <li><a href="login.html"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <section>
+            <h2>Administrar Materias</h2>
+            <form id="form-admin">
+                <label for="materia-admin">Materia:</label>
+                <input type="text" id="materia-admin" name="materia-admin" required>
+                <label for="dia-admin">Día:</label>
+                <select id="dia-admin" name="dia-admin" required>
+                    <option value="lunes">Lunes</option>
+                    <option value="martes">Martes</option>
+                    <option value="miercoles">Miércoles</option>
+                    <option value="jueves">Jueves</option>
+                    <option value="viernes">Viernes</option>
+                    <option value="sabado">Sábado</option>
+                </select>
+                <label for="hora-admin">Hora:</label>
+                <select id="hora-admin" name="hora-admin" required>
+                    <option value="8:00-9:00">8:00 - 9:00</option>
+                    <option value="9:00-10:00">9:00 - 10:00</option>
+                    <option value="10:00-11:00">10:00 - 11:00</option>
+                    <option value="11:00-12:00">11:00 - 12:00</option>
+                    <option value="12:00-13:00">12:00 - 13:00</option>
+                    <option value="13:00-14:00">13:00 - 14:00</option>
+                    <option value="14:00-15:00">14:00 - 15:00</option>
+                </select>
+                <label for="salon-admin">Salón:</label>
+                <input type="text" id="salon-admin" name="salon-admin" required>
+                <button type="submit">Añadir Materia</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Lista de Materias</h2>
+            <table id="tabla-materias">
+                <thead>
+                    <tr>
+                        <th>Materia</th>
+                        <th>Día</th>
+                        <th>Hora</th>
+                        <th>Salón</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Las filas de materias se agregarán aquí dinámicamente -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer class="footer-container">
+        <div class="footer-content">
+            <p>&copy; 2024 - Universidad del Valle de México (UVM). Todos los derechos reservados.</p>
+            <p>
+                <a href="aviso_privacidad.html">Aviso de Privacidad</a> | 
+                <a href="terminos_uso.html">Términos de Uso del Software</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Función para obtener y renderizar las materias desde el servidor
+        function fetchMaterias() {
+            fetch('/api/materias')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al obtener materias: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(materias => {
+                    const tbody = document.getElementById('tabla-materias').querySelector('tbody');
+                    tbody.innerHTML = ''; // Limpiar contenido previo
+                    materias.forEach((materia, index) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${materia.nombre}</td>
+                            <td>${materia.dia}</td>
+                            <td>${materia.hora}</td>
+                            <td>${materia.salon}</td>
+                            <td>
+                                <button onclick="editarMateria(${materia.id})">Editar</button>
+                                <button onclick="eliminarMateria(${materia.id})">Eliminar</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr); // Añadir la fila a la tabla
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al obtener materias:', error);
+                    alert('Hubo un problema al cargar las materias.');
+                });
+        }
+
+        // Función para añadir una nueva materia
+        document.getElementById('form-admin').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const nuevaMateria = {
+                nombre: document.getElementById('materia-admin').value,
+                dia: document.getElementById('dia-admin').value,
+                hora: document.getElementById('hora-admin').value,
+                salon: document.getElementById('salon-admin').value
+            };
+
+            // Verifica que todos los campos están correctamente llenos
+            for (const [key, value] of Object.entries(nuevaMateria)) {
+                if (!value) {
+                    alert(`El campo ${key} no puede estar vacío.`);
+                    return;
+                }
+            }
+
+            // Enviar la nueva materia al servidor
+            fetch('/api/materias', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(nuevaMateria)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    fetchMaterias(); // Actualiza la lista de materias
+                    document.getElementById('form-admin').reset();
+                } else {
+                    alert('Error al agregar materia: ' + data.message);
+                    console.error('Detalles del error:', data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Función para editar una materia
+        function editarMateria(id) {
+            // Lógica para editar materia
+            // Abre un formulario para editar, llena los datos de la materia seleccionada, y envíalos al backend
+            fetch(`/api/materias/${id}`)
+                .then(response => response.json())
+                .then(materia => {
+                    // Rellenar el formulario con los datos de la materia
+                    document.getElementById('materia-admin').value = materia.nombre;
+                    document.getElementById('dia-admin').value = materia.dia;
+                    document.getElementById('hora-admin').value = materia.hora;
+                    document.getElementById('salon-admin').value = materia.salon;
+                    
+                    // Cambiar la lógica del botón para actualizar en vez de crear una nueva materia
+                    document.getElementById('form-admin').addEventListener('submit', function(event) {
+                        event.preventDefault();
+                        const updatedMateria = {
+                            nombre: document.getElementById('materia-admin').value,
+                            dia: document.getElementById('dia-admin').value,
+                            hora: document.getElementById('hora-admin').value,
+                            salon: document.getElementById('salon-admin').value
+                        };
+
+                        fetch(`/api/materias/${id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(updatedMateria)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                fetchMaterias();
+                            } else {
+                                alert('Error al actualizar materia: ' + data.message);
+                            }
+                        });
+                    });
+                });
+        }
+
+        // Función para eliminar una materia
+        function eliminarMateria(id) {
+            fetch(`/api/materias/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    fetchMaterias(); // Actualiza la lista después de eliminar
+                } else {
+                    alert('Error al eliminar materia: ' + data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Renderizar las materias iniciales
+        fetchMaterias();
+    </script>
+</body>
+</html>

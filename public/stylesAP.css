@@ -1,0 +1,73 @@
+/* Estilos generales */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Hace que el cuerpo ocupe toda la altura de la ventana */
+}
+
+.header-container {
+    background-color: red;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    width: 80px; /* Cambiar el tamaño del logo aquí */
+    height: auto; /* Mantener la proporción */
+    margin-right: 10px;
+}
+
+.nav-container {
+    margin-left: auto; /* Mueve el nav a la derecha */
+}
+
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex; /* Utiliza flex para alinear horizontalmente */
+    gap: 20px; /* Espacio entre los enlaces */
+}
+
+.main-container {
+    flex: 1; /* Hace que el contenedor principal ocupe todo el espacio disponible */
+    padding: 20px;
+    display: flex;
+    flex-direction: column; /* Coloca los elementos en columna */
+    align-items: center; /* Centra los elementos horizontalmente */
+}
+
+.privacy-section {
+    max-width: 800px; /* Ancho máximo para mantener la legibilidad */
+    width: 100%; /* Ancho completo para adaptarse a diferentes pantallas */
+    margin-bottom: 20px; /* Espaciado entre secciones */
+}
+
+.footer-container {
+    background-color: #53575b; /* Color del pie de página */
+    color: white; /* Color del texto en el pie */
+    padding: 10px 0; /* Espaciado interno */
+    text-align: center; /* Texto centrado */
+}
+
+.footer-content a {
+    color: #f8f9fa; /* Color de enlaces */
+}
+
+button {
+    padding: 10px 20px; /* Espaciado interno */
+    border: none; /* Sin borde */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    background-color: red; /* Color de fondo del botón */
+    color: white; /* Color del texto */
+    transition: opacity 0.3s; /* Efecto de transición */
+}
+
+button:hover {
+    opacity: 0.8; /* Efecto de hover */
+}

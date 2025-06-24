@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Usuarios</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header-container">
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo UVM" class="logo">
+        </div>
+        <nav class="nav-container">
+            <ul class="nav-list">
+                <li><a href="admin.html"><i class="fas fa-cogs"></i> Administrar Materias</a></li>
+                <li><a href="login.html"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a></li>
+            </ul>
+        </nav>
+        <div id="welcome-message"></div> <!-- Aquí se muestra el mensaje de bienvenida -->
+    </header>
+
+    <main class="main-container">
+        <div class="form-container">
+            <section>
+                <h2>Agregar Usuario</h2>
+                <form id="form-usuario">
+                    <label for="nombre-usuario">Nombre:</label>
+                    <input type="text" id="nombre-usuario" name="nombre-usuario" required>
+                    <label for="matricula-usuario">Matrícula:</label>
+                    <input type="text" id="matricula-usuario" name="matricula-usuario" required>
+                    <label for="username-usuario">Username:</label>
+                    <input type="text" id="username-usuario" name="username-usuario" required>
+                    <label for="password-usuario">Contraseña:</label>
+                    <input type="password" id="password-usuario" name="password-usuario" required>
+                    <label for="rol-usuario">Rol:</label>
+                    <select id="rol-usuario" name="rol-usuario" required>
+                        <option value="admin">Admin</option>
+                        <option value="alumno">Alumno</option>
+                        <option value="profesor">Profesor</option>
+                    </select>
+                    <label for="NSS-usuario">NSS:</label>
+                    <input type="text" id="NSS-usuario" name="NSS-usuario" required>
+                    <label for="CURP-usuario">CURP:</label>
+                    <input type="text" id="CURP-usuario" name="CURP-usuario" required>
+                    <label for="telefono-usuario">Teléfono:</label>
+                    <input type="text" id="telefono-usuario" name="telefono-usuario" required>
+                    <button type="submit">Añadir Usuario</button>
+                </form>
+            </section>
+        </div>
+        <div class="list-container">
+            <section>
+                <h2>Lista de Usuarios</h2>
+                <table id="tabla-usuarios">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Matricula</th>
+                            <th>Username</th>
+                            <th>Rol</th>
+                            <th>NSS</th>
+                            <th>CURP</th>
+                            <th>Teléfono</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Las filas de usuarios se agregarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer-container">
+        <div class="footer-content">
+            <p>&copy; 2024 - Universidad del Valle de México (UVM). Todos los derechos reservados.</p>
+            <p>
+                <a href="aviso_privacidad.html">Aviso de Privacidad</a> | 
+                <a href="terminos_uso.html">Términos de Uso del Software</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Función para obtener y renderizar los usuarios desde el servidor
+        function fetchUsuarios() {
+            fetch('/api/usuarios')
+                .then(response => response.json())
+                .then(usuarios => {
+                    const tbody = document.getElementById('tabla-usuarios').querySelector('tbody');
+                    tbody.innerHTML = '';
+                    usuarios.forEach((usuario) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${usuario.id}</td>
+                            <td>${usuario.nombre}</td>
+                            <td>${usuario.matricula}</td>
+                            <td>${usuario.username}</td>
+                            <td>${usuario.rol}</td>
+                            <td>${usuario.NSS}</td>
+                            <td>${usuario.CURP}</td>
+                            <td>${usuario.telefono}</td>
+                            <td>
+                                <button onclick="eliminarUsuario('${usuario.matricula}')">Eliminar</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => console.error('Error al obtener usuarios:', error));
+        }
+
+        // Función para añadir un nuevo usuario
+        document.getElementById('form-usuario').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const nuevoUsuario = {
+                nombre: document.getElementById('nombre-usuario').value,
+                matricula: document.getElementById('matricula-usuario').value,
+                username: document.getElementById('username-usuario').value,
+                password: document.getElementById('password-usuario').value,
+                rol: document.getElementById('rol-usuario').value,
+                NSS: document.getElementById('NSS-usuario').value,
+                CURP: document.getElementById('CURP-usuario').value,
+                telefono: document.getElementById('telefono-usuario').value
+            };
+
+            fetch('/api/usuarios', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(nuevoUsuario)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Log para verificar respuesta
+                if (data.status === 'success') {
+                    alert('Usuario agregado con éxito');
+                    document.getElementById('form-usuario').reset();
+                    fetchUsuarios(); // Actualiza la lista de usuarios
+                } else {
+                    alert('Error al agregar usuario: ' + data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Función para eliminar un usuario
+        function eliminarUsuario(matricula) {
+            if (confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
+                fetch(`/api/usuarios/${matricula}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        fetchUsuarios(); // Actualiza la lista de usuarios
+                    } else {
+                        alert('Error al eliminar usuario: ' + data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+
+        // Cargar la lista de usuarios al cargar la página
+        fetchUsuarios();
+    </script>
+</body>
+</html>

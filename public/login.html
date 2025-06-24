@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - UVM</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header-container">
+        <div class="logo-container">
+            <img src="logo.png" alt="UVM Logo" class="logo">
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="login-container">
+            <div class="login-box">
+                <h2>Iniciar Sesión</h2>
+                <form id="login-form">
+                    <div class="input-group">
+                        <label for="username"><i class="fas fa-user"></i></label>
+                        <input type="text" id="username" name="username" placeholder="Usuario" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="password"><i class="fas fa-lock"></i></label>
+                        <input type="password" id="password" name="password" placeholder="Contraseña" required>
+                    </div>
+                    <button type="submit">Entrar</button>
+                </form>
+                <div class="forgot-password">
+                    <a href="recuperacion.html">¿Olvidaste tu contraseña?</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-container">
+        <div class="footer-content">
+            <p>&copy; 2024 - Universidad del Valle de México (UVM). Todos los derechos reservados.</p>
+            <p>
+                <a href="aviso_privacidad.html">Aviso de Privacidad</a> | 
+                <a href="terminos_uso.html">Términos de Uso del Software</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();  // Previene el envío normal del formulario
+    
+            const formData = new FormData(e.target);
+            const data = {
+                username: formData.get('username'),
+                password: formData.get('password')
+            };
+    
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+    
+                const result = await response.json();
+    
+                if (result.status === 'success') {
+                    // Redirigir al usuario a la página correcta según su rol
+                    window.location.href = result.redirect;
+                } else {
+                    alert(result.message);  // Mostrar error si las credenciales son incorrectas
+                }
+            } catch (err) {
+                console.error('Error al iniciar sesión:', err);
+                alert('Error en la conexión con el servidor');
+            }
+        });
+    </script>
+</body>
+</html>
